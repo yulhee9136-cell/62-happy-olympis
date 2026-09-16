@@ -92,6 +92,39 @@
 
   .waiting-pulse{ display:inline-block; animation: pulse 1.4s infinite; }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  .modal-bg{ display:none; position:fixed; inset:0; background:rgba(20,30,40,0.6); align-items:center; justify-content:center; padding:20px; z-index:150; }
+  .modal-bg.active{ display:flex; }
+  .modal-inner{ max-width:420px; width:100%; max-height:90vh; overflow:auto; text-align:center; }
+  .modal-x-close{ position:fixed; top:18px; right:18px; width:42px; height:42px; border-radius:50%; background:#fff; border:2px solid var(--line); font-size:20px; line-height:1; cursor:pointer; z-index:160; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .qr-box{ background:#fff; border-radius:16px; padding:24px; }
+  .qr-box img{ width:100%; max-width:340px; }
+  .qr-link{ font-size:12px; color:var(--ink-soft); word-break:break-all; margin-top:10px; }
+
+  .lang-bar{ display:flex; gap:8px; margin:12px 0 4px; }
+  .lang-btn{ padding:6px 14px; border-radius:16px; border:2px solid var(--line); background:#fff; font-size:13px; cursor:pointer; color:var(--ink-soft); }
+  .lang-btn.on{ background:var(--sky); color:#fff; border-color:var(--sky); }
+
+  .pool-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px; margin-top:14px; }
+  .item-card{ background:#fff; border:2px solid var(--sky); border-radius:14px; padding:12px 10px; text-align:center; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+  .item-card .emo{ font-size:30px; line-height:1; }
+  .item-card .kw{ font-weight:700; font-size:14px; margin-top:4px; color:var(--ink); }
+  .item-card .full{ font-size:11px; color:var(--ink-soft); margin-top:4px; line-height:1.35; }
+  .item-card.empty-slot-placeholder{ border-style:dashed; border-color:var(--line); background:transparent; cursor:default; min-height:78px; display:flex; align-items:center; justify-content:center; }
+  .item-card.empty-slot-placeholder .ph-text{ color:var(--line); font-size:12px; }
+
+  .slots-col{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+  .slot{ display:flex; align-items:center; gap:12px; border:3px dashed var(--sky); border-radius:14px; padding:10px 14px; min-height:60px; background:var(--bg-deep); transition: background .15s, border-color .15s; }
+  .slot.filled{ border-style:solid; border-color:var(--green); background:#fff; }
+  .slot.drag-over{ background:#FFF6D8; border-color:var(--yellow-deep); }
+  .slot .slot-num{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; flex-shrink:0; }
+  .slot .slot-content{ flex:1; display:flex; align-items:center; gap:10px; cursor:grab; touch-action:none; }
+  .slot .slot-content .emo{ font-size:22px; }
+  .slot .slot-content .kw{ font-weight:700; font-size:14px; }
+  .slot .slot-empty-text{ color:var(--ink-soft); font-size:13px; }
+  .slot .remove-btn{ background:none; border:none; color:var(--bad); font-size:20px; cursor:pointer; padding:2px 6px; }
+
+  .drag-ghost{ position:fixed; pointer-events:none; z-index:200; opacity:0.95; transform:scale(1.06) rotate(-2deg); box-shadow:0 8px 20px rgba(0,0,0,0.25); }
 </style>
 </head>
 <body>
@@ -138,10 +171,21 @@
 <div class="screen" id="screen-teacher">
   <div class="top-nav">
     <span class="round-badge" id="teacher-round-badge">1 라운드</span>
-    <button class="link-btn" onclick="logout()">로그아웃</button>
+    <div style="display:flex; gap:8px;">
+      <button class="btn-ghost" onclick="showQR()">📱 QR 띄우기</button>
+      <button class="link-btn" onclick="logout()">로그아웃</button>
+    </div>
   </div>
   <h2 style="font-family:'Gaegu'; color:var(--sky-deep); margin-top:10px;">교사 진행 화면</h2>
   <div id="teacher-body" style="margin-top:10px;"></div>
+</div>
+
+<!-- QR 모달 -->
+<div class="modal-bg" id="qr-modal-bg" onclick="closeQrIfBg(event)">
+  <button class="modal-x-close" onclick="closeQr()" aria-label="닫기">✕</button>
+  <div class="modal-inner">
+    <div class="qr-box" id="qr-box-content"></div>
+  </div>
 </div>
 
 <!-- 3. 최종 화면 -->
@@ -198,30 +242,81 @@ const CODES = {
 };
 const TEACHER_CODE = "6200";
 
-// ---------- 라운드 문항 ----------
+// ---------- 라운드 문항 (키워드+이모지 포함) ----------
 const SETS = [
   { label:'세트 1 · 몸이 먼저 아는 행복', items:[
-    '눈썰매장에서 호호 불며 먹는 군고구마',
-    '물놀이하고 나와 먹는 시원한 컵라면',
-    '축구하다가 들이켜는 시원한 물 한 모금',
-    '땀범벅 체육 끝나고 뜯는 아이스크림',
-    '학교 앞에서 친구들과 같이 사먹는 떡볶이'
+    { text:'눈썰매장에서 호호 불며 먹는 군고구마', keyword:'군고구마', emoji:'🍠' },
+    { text:'물놀이하고 나와 먹는 시원한 컵라면', keyword:'컵라면', emoji:'🍜' },
+    { text:'축구하다가 들이켜는 시원한 물 한 모금', keyword:'물 한 모금', emoji:'💧' },
+    { text:'땀범벅 체육 끝나고 뜯는 아이스크림', keyword:'아이스크림', emoji:'🍦' },
+    { text:'학교 앞에서 친구들과 같이 사먹는 떡볶이', keyword:'떡볶이', emoji:'🌶️' }
   ]},
   { label:'세트 2 · 마음이 훅 따뜻해지는 순간', items:[
-    '부모님께서 나의 노력을 알아봐주실 때',
-    '힘든 티도 안 냈는데 친구가 먼저 연락해올 때',
-    '안 친한 줄 알았던 애가 내 생일 기억해줄 때',
-    '준비물 깜빡했는데 짝꿍이 말없이 나눠줄 때',
-    '오랜만에 만난 친구가 반갑게 손 흔들어줄 때'
+    { text:'부모님께서 나의 노력을 알아봐주실 때', keyword:'인정받기', emoji:'👏' },
+    { text:'힘든 티도 안 냈는데 친구가 먼저 연락해올 때', keyword:'먼저 연락', emoji:'📱' },
+    { text:'안 친한 줄 알았던 애가 내 생일 기억해줄 때', keyword:'생일 축하', emoji:'🎂' },
+    { text:'준비물 깜빡했는데 짝꿍이 말없이 나눠줄 때', keyword:'나눔', emoji:'🤝' },
+    { text:'오랜만에 만난 친구가 반갑게 손 흔들어줄 때', keyword:'반가움', emoji:'👋' }
   ]},
   { label:'세트 3 · 일상 속 작은 행복', items:[
-    '하루를 무사히 마치고 침대에 누웠을 때',
-    '우연히 바라본 하늘이 아름다울 때',
-    '좋아하는 구독 유튜버 새 알람 떴을 때',
-    '새로운 메뉴 도전해봤는데 성공했을 때',
-    '알람 없이 눈 떴는데 아직 주말 늦잠 잘 수 있을 때'
+    { text:'하루를 무사히 마치고 침대에 누웠을 때', keyword:'포근한 침대', emoji:'🛏️' },
+    { text:'우연히 바라본 하늘이 아름다울 때', keyword:'예쁜 하늘', emoji:'🌅' },
+    { text:'좋아하는 구독 유튜버 새 알람 떴을 때', keyword:'새 영상 알림', emoji:'🔔' },
+    { text:'새로운 메뉴 도전해봤는데 성공했을 때', keyword:'도전 성공', emoji:'🎉' },
+    { text:'알람 없이 눈 떴는데 아직 주말 늦잠 잘 수 있을 때', keyword:'늦잠', emoji:'😴' }
   ]}
 ];
+
+// ---------- 다국어 번역 (미리 입력, 실시간 번역 아님 — 수업 전 원어민 검수 권장) ----------
+const TRANSLATIONS = {
+  ru: [
+    [
+      "Есть печёный батат, дуя на него, на горке для катания на санках",
+      "Прохладная лапша быстрого приготовления после купания",
+      "Глоток холодной воды во время игры в футбол",
+      "Мороженое после урока физкультуры, когда весь в поту",
+      "Токпокки, купленные с друзьями у школы"
+    ],
+    [
+      "Когда родители замечают мои старания",
+      "Когда я не показывал, что мне тяжело, а друг сам написал первым",
+      "Когда не самый близкий одноклассник вспоминает о моём дне рождения",
+      "Когда я забыл школьные принадлежности, а сосед по парте молча поделился",
+      "Когда давно не видевший меня друг радостно машет рукой"
+    ],
+    [
+      "Когда лежишь в кровати после благополучно прошедшего дня",
+      "Когда случайно взглянул на красивое небо",
+      "Когда приходит уведомление о новом видео любимого блогера",
+      "Когда попробовал новое блюдо и получилось вкусно",
+      "Когда просыпаешься без будильника и понимаешь, что ещё можно поспать подольше в выходной"
+    ]
+  ],
+  zh: [
+    [
+      "在雪橇场吹着热气吃烤红薯",
+      "玩水后吃的凉爽泡面",
+      "踢足球时喝下的一口凉水",
+      "满身大汗上完体育课后吃的冰淇淋",
+      "和朋友们在校门口一起买来吃的炒年糕"
+    ],
+    [
+      "父母认可我的努力时",
+      "明明没表现出难过，朋友却先联系我时",
+      "以为不熟的同学竟然记得我的生日时",
+      "忘带学习用品时，同桌默默分给我时",
+      "好久不见的朋友开心地向我挥手时"
+    ],
+    [
+      "平安结束一天后躺到床上时",
+      "偶然抬头看到美丽天空时",
+      "喜欢的博主发布新视频提醒时",
+      "尝试新菜谱并成功时",
+      "没有闹钟自然醒来，发现周末还能继续睡懒觉时"
+    ]
+  ]
+};
+let uiLang = 'ko';
 
 // ---------- 효과음 (Web Audio API, 파일 없이 직접 생성) ----------
 let audioCtx = null;
@@ -237,6 +332,7 @@ function tone(freq, start, dur, type, gain){
   osc.start(ctx.currentTime+start); osc.stop(ctx.currentTime+start+dur+0.05);
 }
 function sfxSubmit(){ tone(880,0,0.12,'triangle',0.12); }
+function sfxPlace(){ tone(600,0,0.09,'triangle',0.12); }
 function sfxReveal(){
   [220,260,300,340,500,700].forEach((f,i)=> tone(f, i*0.09, 0.15, 'square', 0.09));
 }
@@ -289,7 +385,7 @@ function track(ref, event){ listeners.push({ref, event}); }
 function detachAllListeners(){ listeners.forEach(l=> l.ref.off(l.event)); listeners = []; }
 
 // ================= 학생 로직 =================
-let studentState = { currentRound:1, order:null, submitted:false, resultShown:{} };
+let studentState = { round:1, assign:[null,null,null,null,null], resultShown:{} };
 
 function initStudent(){
   const gameRef = db.ref(`${ROOT}/game/currentRound`);
@@ -297,7 +393,6 @@ function initStudent(){
   gameRef.on('value', snap=>{
     const r = snap.val() || 1;
     if(r === 'final'){ showFinalForEveryone(); return; }
-    studentState.currentRound = r;
     document.getElementById('student-round-badge').textContent = `${r} 라운드`;
     loadStudentRound(r);
   });
@@ -305,33 +400,27 @@ function initStudent(){
 }
 
 function loadStudentRound(r){
-  studentState.order = SETS[r-1].items.map((t,i)=>({text:t, origIdx:i}));
-  studentState.submitted = false;
+  studentState = { round:r, assign:[null,null,null,null,null], resultShown:{} };
 
-  // 이미 제출/공개된 상태인지 확인
   const subRef = db.ref(`${ROOT}/rounds/${r}/submissions/${session.code}`);
   const revealRef = db.ref(`${ROOT}/rounds/${r}/reveal`);
   Promise.all([subRef.once('value'), revealRef.once('value')]).then(([subSnap, revealSnap])=>{
     const mySub = subSnap.val();
     const reveal = revealSnap.val();
-    if(mySub){
-      studentState.submitted = true;
-      studentState.order = mySub.order.map(idx=>({text:SETS[r-1].items[idx], origIdx:idx}));
-    }
+    if(mySub){ studentState.assign = mySub.order.slice(); }
     if(reveal){
       renderStudentReveal(r, reveal, mySub);
     }else if(mySub){
       renderStudentWaiting(r);
     }else{
-      renderStudentRanking(r);
+      renderStudentRankingUI(r);
     }
-    // 실시간으로 reveal 감시 (아직 공개 안 됐을 때)
     if(!reveal){
       const rr = db.ref(`${ROOT}/rounds/${r}/reveal`);
       track(rr, 'value');
       rr.on('value', s=>{
         const rv = s.val();
-        if(rv && studentState.currentRound === r){
+        if(rv && studentState.round === r){
           db.ref(`${ROOT}/rounds/${r}/submissions/${session.code}`).once('value').then(ss=>{
             renderStudentReveal(r, rv, ss.val());
           });
@@ -341,45 +430,149 @@ function loadStudentRound(r){
   });
 }
 
-function renderStudentRanking(r){
+// ---------- 랭킹 화면 (드래그 앤 드롭) ----------
+function renderStudentRankingUI(r){
   const body = document.getElementById('student-body');
   body.innerHTML = `
     <h2 style="font-family:'Gaegu'; color:var(--sky-deep);">${SETS[r-1].label}</h2>
-    <p class="lede">날 가장 행복하게 하는 순서대로 정해보세요. 화살표로 순서를 바꿀 수 있어요.</p>
-    <div class="rank-list" id="rank-list"></div>
-    <div class="actions"><button class="btn-primary" onclick="submitRank()">제출하기</button></div>
+    <p class="lede">카드를 아래 순위 칸으로 끌어다 놓아보세요. 1위가 가장 행복한 것이에요!</p>
+    <div class="lang-bar" id="lang-bar"></div>
+    <div class="pool-grid" id="pool-grid"></div>
+    <div class="slots-col" id="slots-col"></div>
+    <div class="actions"><button class="btn-primary" id="submit-rank-btn" disabled onclick="submitRank()">제출하기</button></div>
   `;
-  renderRankList();
+  renderLangBar();
+  renderPoolAndSlots();
 }
-function renderRankList(){
-  const wrap = document.getElementById('rank-list');
-  if(!wrap) return;
-  wrap.innerHTML = '';
-  studentState.order.forEach((item,i)=>{
-    const row = document.createElement('div');
-    row.className = 'rank-item';
-    row.innerHTML = `
-      <div class="rank-num">${i+1}</div>
-      <div class="rank-text">${item.text}</div>
-      <div class="rank-arrows">
-        <button class="arrow-btn" ${i===0?'disabled':''} onclick="moveItem(${i},-1)">▲</button>
-        <button class="arrow-btn" ${i===studentState.order.length-1?'disabled':''} onclick="moveItem(${i},1)">▼</button>
-      </div>`;
-    wrap.appendChild(row);
+function renderLangBar(){
+  const bar = document.getElementById('lang-bar');
+  if(!bar) return;
+  const langs = [['ko','한국어'],['ru','Русский'],['zh','中文']];
+  bar.innerHTML = langs.map(([code,label])=>`<button class="lang-btn ${uiLang===code?'on':''}" onclick="setLang('${code}')">${label}</button>`).join('');
+}
+function setLang(code){ uiLang = code; renderLangBar(); renderPoolAndSlots(); }
+
+function itemCardInner(r, idx){
+  const obj = SETS[r-1].items[idx];
+  if(uiLang==='ko'){
+    return `<div class="emo">${obj.emoji}</div><div class="kw">${obj.keyword}</div><div class="full">${obj.text}</div>`;
+  }
+  const t = (TRANSLATIONS[uiLang][r-1] && TRANSLATIONS[uiLang][r-1][idx]) || obj.text;
+  return `<div class="emo">${obj.emoji}</div><div class="full" style="font-size:13px; margin-top:6px;">${t}</div>`;
+}
+
+function renderPoolAndSlots(){
+  const r = studentState.round;
+  const poolGrid = document.getElementById('pool-grid');
+  const slotsCol = document.getElementById('slots-col');
+  if(!poolGrid || !slotsCol) return;
+
+  poolGrid.innerHTML = '';
+  for(let idx=0; idx<5; idx++){
+    const placedAt = studentState.assign.indexOf(idx);
+    const card = document.createElement('div');
+    if(placedAt !== -1){
+      card.className = 'item-card empty-slot-placeholder';
+      card.innerHTML = `<span class="ph-text">${placedAt+1}위에 놓임</span>`;
+    }else{
+      card.className = 'item-card';
+      card.innerHTML = itemCardInner(r, idx);
+      makeDraggable(card, { origIdx: idx, fromSlot: null });
+    }
+    poolGrid.appendChild(card);
+  }
+
+  slotsCol.innerHTML = '';
+  for(let rank=0; rank<5; rank++){
+    const idx = studentState.assign[rank];
+    const slot = document.createElement('div');
+    slot.className = 'slot' + (idx!==null? ' filled':'');
+    slot.dataset.rank = rank;
+    if(idx!==null){
+      slot.innerHTML = `
+        <div class="slot-num">${rank+1}</div>
+        <div class="slot-content">${itemCardInner(r, idx)}</div>
+        <button class="remove-btn" onclick="removeFromSlot(${rank})">✕</button>`;
+      makeDraggable(slot.querySelector('.slot-content'), { origIdx: idx, fromSlot: rank });
+    }else{
+      slot.innerHTML = `<div class="slot-num">${rank+1}</div><div class="slot-empty-text">여기로 끌어다 놓으세요</div>`;
+    }
+    slotsCol.appendChild(slot);
+  }
+  updateSubmitButton();
+}
+function removeFromSlot(rank){ studentState.assign[rank] = null; renderPoolAndSlots(); }
+function updateSubmitButton(){
+  const btn = document.getElementById('submit-rank-btn');
+  if(!btn) return;
+  btn.disabled = studentState.assign.some(v=>v===null);
+}
+
+// ---------- 드래그 앤 드롭 (Pointer Events — 터치/마우스 공용) ----------
+function makeDraggable(el, payload){
+  el.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    const r = studentState.round;
+    const ghost = document.createElement('div');
+    ghost.className = 'item-card drag-ghost';
+    ghost.style.width = el.getBoundingClientRect().width + 'px';
+    ghost.innerHTML = itemCardInner(r, payload.origIdx);
+    document.body.appendChild(ghost);
+    moveGhost(ghost, e.clientX, e.clientY);
+    el.style.opacity = '0.25';
+
+    function onMove(ev){
+      moveGhost(ghost, ev.clientX, ev.clientY);
+      highlightSlotAt(ev.clientX, ev.clientY);
+    }
+    function onUp(ev){
+      document.removeEventListener('pointermove', onMove);
+      ghost.remove();
+      el.style.opacity = '';
+      clearHighlights();
+      const dropRank = findSlotRankAt(ev.clientX, ev.clientY);
+      handleDrop(payload, dropRank);
+    }
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp, { once:true });
   });
 }
-function moveItem(i,dir){
-  const j=i+dir; if(j<0||j>=studentState.order.length) return;
-  [studentState.order[i], studentState.order[j]] = [studentState.order[j], studentState.order[i]];
-  renderRankList();
+function moveGhost(ghost,x,y){ ghost.style.left = (x - ghost.offsetWidth/2)+'px'; ghost.style.top = (y - ghost.offsetHeight/2)+'px'; }
+function findSlotRankAt(x,y){
+  const el = document.elementFromPoint(x,y);
+  if(!el) return null;
+  const slotEl = el.closest('.slot');
+  if(!slotEl) return null;
+  return parseInt(slotEl.dataset.rank);
 }
+function highlightSlotAt(x,y){
+  clearHighlights();
+  const el = document.elementFromPoint(x,y);
+  const slotEl = el && el.closest('.slot');
+  if(slotEl) slotEl.classList.add('drag-over');
+}
+function clearHighlights(){ document.querySelectorAll('.slot.drag-over').forEach(s=>s.classList.remove('drag-over')); }
+function handleDrop(payload, dropRank){
+  if(dropRank === null){
+    if(payload.fromSlot !== null) studentState.assign[payload.fromSlot] = null;
+    renderPoolAndSlots();
+    return;
+  }
+  if(payload.fromSlot === dropRank){ renderPoolAndSlots(); return; }
+  const occupant = studentState.assign[dropRank];
+  if(payload.fromSlot !== null) studentState.assign[payload.fromSlot] = occupant;
+  studentState.assign[dropRank] = payload.origIdx;
+  sfxPlace();
+  renderPoolAndSlots();
+}
+
 async function submitRank(){
-  const r = studentState.currentRound;
-  const orderIdxs = studentState.order.map(o=>o.origIdx);
+  const r = studentState.round;
+  if(studentState.assign.some(v=>v===null)) return;
+  const orderIdxs = studentState.assign.slice();
   try{
     await db.ref(`${ROOT}/rounds/${r}/submissions/${session.code}`).set({ name: session.name, order: orderIdxs, ts: Date.now() });
     sfxSubmit();
-    studentState.submitted = true;
     renderStudentWaiting(r);
   }catch(e){ console.error(e); showStatus('제출 중 오류가 발생했어요.', 'bad'); }
 }
@@ -400,14 +593,17 @@ function renderStudentReveal(r, reveal, mySub){
     const rows = mySub.order.map((idx,pos)=>{
       const hit = reveal.order[pos] === idx;
       if(hit) matchCount++;
-      return {text: SETS[r-1].items[idx], pos, hit};
+      const obj = SETS[r-1].items[idx];
+      return { emoji:obj.emoji, keyword:obj.keyword, pos, hit };
     });
-    matchHtml = `<div>${rows.map(row=>`<div class="match-row ${row.hit?'hit':''}">${row.pos+1}위 · ${row.text} ${row.hit?'🍀 일치!':''}</div>`).join('')}</div>`;
+    matchHtml = `<div>${rows.map(row=>`<div class="match-row ${row.hit?'hit':''}">${row.pos+1}위 · ${row.emoji} ${row.keyword} ${row.hit?'🍀 일치!':''}</div>`).join('')}</div>`;
   }
+  const revealList = reveal.order.map(idx=>{ const o=SETS[r-1].items[idx]; return `${o.emoji}${o.keyword}`; }).join(' → ');
   body.innerHTML = `
     <h2 style="font-family:'Gaegu'; color:var(--sky-deep);">${SETS[r-1].label}</h2>
     <div class="reveal-box">
       <p style="font-weight:700; color:var(--yellow-deep);">🎲 정답 학생: ${reveal.name}</p>
+      <p class="lede" style="margin-bottom:10px;">순위: ${revealList}</p>
       ${matchHtml}
     </div>
     <p class="lede waiting-pulse" style="margin-top:14px;">선생님이 다음 라운드를 시작할 때까지 기다려주세요.</p>
@@ -453,7 +649,7 @@ function renderTeacherRound(r){
     <div class="card">
       <h3 style="font-family:'Gaegu'; color:var(--sky-deep); font-size:20px;">${SETS[r-1].label}</h3>
       <ol style="padding-left:20px; color:var(--ink-soft); font-size:14px;">
-        ${SETS[r-1].items.map(t=>`<li>${t}</li>`).join('')}
+        ${SETS[r-1].items.map(o=>`<li>${o.emoji} <b>${o.keyword}</b> — ${o.text}</li>`).join('')}
       </ol>
     </div>
     <div class="card">
@@ -485,7 +681,7 @@ function renderTeacherRound(r){
       area.innerHTML = `
         <div class="reveal-box">
           <p style="font-weight:700; color:var(--yellow-deep);">🎲 이번 라운드 정답 학생: ${rv.name}</p>
-          <p class="lede">순위: ${rv.order.map(idx=>SETS[r-1].items[idx]).join(' → ')}</p>
+          <p class="lede">순위: ${rv.order.map(idx=>{const o=SETS[r-1].items[idx]; return o.emoji+o.keyword;}).join(' → ')}</p>
         </div>
         <div class="actions">
           <button class="btn-primary" onclick="nextRound(${r})">${r<3? '다음 라운드로' : '전체 결과 보기'}</button>
@@ -539,6 +735,27 @@ async function showFinalForEveryone(){
   sfxReveal();
   setTimeout(sfxClover, 500);
 }
+// ================= QR 코드 =================
+function showQR(){
+  const url = window.location.href;
+  const isRealUrl = /^https?:\/\//i.test(url);
+  const box = document.getElementById('qr-box-content');
+  if(!isRealUrl){
+    box.innerHTML = `
+      <h2 style="font-family:'Gaegu'; color:var(--sky-deep); font-size:22px;">아직은 QR을 만들 수 없어요</h2>
+      <p class="lede" style="text-align:left;">지금 이 화면은 실제 인터넷 주소가 없는 미리보기 상태예요 (주소: <b>${url}</b>).<br><br>
+      이 파일을 깃허브(GitHub Pages) 등에 올려서 실제 https:// 주소가 생긴 뒤에 다시 "QR 띄우기"를 눌러주세요.</p>`;
+  }else{
+    box.innerHTML = `
+      <h2 style="font-family:'Gaegu'; color:var(--sky-deep); font-size:26px;">여기로 접속하세요!</h2>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=460x460&data=${encodeURIComponent(url)}" alt="QR 코드"
+        onerror="this.replaceWith(Object.assign(document.createElement('p'), {className:'qr-link', textContent:'QR 이미지를 불러오지 못했어요. 아래 주소를 직접 입력해주세요.'}))">
+      <div class="qr-link">${url}</div>`;
+  }
+  document.getElementById('qr-modal-bg').classList.add('active');
+}
+function closeQr(){ document.getElementById('qr-modal-bg').classList.remove('active'); }
+function closeQrIfBg(e){ if(e.target.id==='qr-modal-bg') closeQr(); }
 </script>
 </body>
 </html>
