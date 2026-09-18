@@ -173,6 +173,7 @@
     <span class="round-badge" id="teacher-round-badge">1 라운드</span>
     <div style="display:flex; gap:8px;">
       <button class="btn-ghost" onclick="showQR()">📱 QR 띄우기</button>
+      <button class="btn-ghost" style="border-color:var(--bad); color:var(--bad);" onclick="askReset()">🔄 초기화</button>
       <button class="link-btn" onclick="logout()">로그아웃</button>
     </div>
   </div>
@@ -185,6 +186,19 @@
   <button class="modal-x-close" onclick="closeQr()" aria-label="닫기">✕</button>
   <div class="modal-inner">
     <div class="qr-box" id="qr-box-content"></div>
+  </div>
+</div>
+
+<!-- 초기화 확인 모달 -->
+<div class="modal-bg" id="reset-confirm-bg">
+  <div class="modal-inner">
+    <div class="card" style="text-align:center;">
+      <p class="lede" style="margin-top:0; font-size:16px;">정말 초기화할까요?<br>모든 라운드 기록과 클로버가 삭제되고, 1라운드부터 다시 시작돼요.</p>
+      <div class="actions" style="justify-content:center;">
+        <button class="btn-ghost" style="border-color:var(--bad); color:var(--bad);" onclick="doReset()">초기화</button>
+        <button class="btn-ghost" onclick="closeResetConfirm()">취소</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -735,6 +749,23 @@ async function showFinalForEveryone(){
   sfxReveal();
   setTimeout(sfxClover, 500);
 }
+// ================= 초기화 =================
+function askReset(){ document.getElementById('reset-confirm-bg').classList.add('active'); }
+function closeResetConfirm(){ document.getElementById('reset-confirm-bg').classList.remove('active'); }
+async function doReset(){
+  closeResetConfirm();
+  showStatus('초기화하는 중...', 'info');
+  try{
+    await db.ref(`${ROOT}/rounds`).remove();
+    await db.ref(`${ROOT}/game/currentRound`).set(0);
+    await db.ref(`${ROOT}/game/currentRound`).set(1);
+    showStatus('초기화 완료! 1라운드부터 다시 시작합니다.', 'ok', 3000);
+  }catch(e){
+    console.error(e);
+    showStatus('초기화 중 오류가 발생했어요.', 'bad');
+  }
+}
+
 // ================= QR 코드 =================
 function showQR(){
   const url = window.location.href;
