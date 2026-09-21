@@ -650,6 +650,7 @@ function showRevealOverlay(r, pick, allNames, onLanded){
     elapsed += interval;
     if(elapsed >= totalMs){
       nameEl.textContent = pick.name;
+      stopSound(el('sfxDrumroll'));
       setTimeout(()=> revealPhase(r, pick, onLanded), 250);
       return;
     }
@@ -670,11 +671,15 @@ async function revealPhase(r, pick, onLanded){
       <p style="font-size:16px; line-height:1.7; color:var(--ink);">${pick.order.map(i=>SETS[r-1].items[i].ko).join('<br>→ ')}</p>
     </div>
     <div class="actions" style="justify-content:center; margin-top:22px;">
-      <button class="btn-primary" onclick="closeOverlay()">닫기</button>
+      <button class="btn-primary" onclick="advanceFromOverlay(${r})">${r<3? '다음 라운드로' : '게임 종료하기'}</button>
     </div>`;
   playFromStart(el('sfxTada'));
   playFromStart(el('sfxCheer'));
   spawnConfetti(34);
+}
+function advanceFromOverlay(r){
+  closeOverlay();
+  nextRound(r);
 }
 function spawnConfetti(n){
   const overlay = document.getElementById('reveal-overlay');
@@ -688,6 +693,7 @@ function spawnConfetti(n){
 function closeOverlay(){
   document.getElementById('reveal-overlay').classList.remove('active');
   document.querySelectorAll('.confetti').forEach(e=>e.remove());
+  stopSound(el('sfxDrumroll'));
   if(soundOn) playFromStart(el('sfxBgm'));
 }
 
