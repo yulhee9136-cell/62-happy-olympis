@@ -258,57 +258,58 @@ const TEACHER_CODE = "6200";
 const TINTS = ["#FFF0DE","#DEFAF7","#EAFAD2","#F0EBFF"];
 function icon(key){
   const I = {
-    academy: `<rect x="18" y="34" width="64" height="52" rx="6" fill="#FFB800"/><rect x="18" y="34" width="64" height="10" rx="4" fill="#FF8A00"/><rect x="30" y="50" width="14" height="14" rx="2" fill="#FFF6DC"/><rect x="56" y="50" width="14" height="14" rx="2" fill="#FFF6DC"/><rect x="42" y="70" width="16" height="16" rx="2" fill="#8A4B00"/><ellipse cx="70" cy="26" rx="18" ry="13" fill="#FF3E8C" transform="rotate(-8 70 26)"/><text x="70" y="30" font-family="Jua" font-size="13" fill="#fff" text-anchor="middle">휴강</text>`,
-    lunch: `<rect x="14" y="52" width="72" height="30" rx="8" fill="#23E5DB"/><rect x="20" y="58" width="18" height="18" rx="4" fill="#fff"/><rect x="41" y="58" width="18" height="18" rx="4" fill="#fff"/><ellipse cx="68" cy="66" rx="12" ry="9" fill="#FFF3CE"/><path d="M62 48 C60 40 66 40 64 32" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M78 48 C76 40 82 40 80 32" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-    kart: `<path d="M16 62 L26 44 L64 44 L76 62 Z" fill="#B6FF3B"/><rect x="12" y="60" width="68" height="14" rx="7" fill="#8FDB1A"/><circle cx="28" cy="76" r="9" fill="#1A1030"/><circle cx="66" cy="76" r="9" fill="#1A1030"/><circle cx="28" cy="76" r="3.5" fill="#fff"/><circle cx="66" cy="76" r="3.5" fill="#fff"/><rect x="80" y="30" width="4" height="26" fill="#666"/><path d="M84 30 L100 36 L84 42 Z" fill="#FF3E8C" transform="translate(-8,0)"/><text x="42" y="58" font-family="Jua" font-size="16" fill="#1A1030" text-anchor="middle">1</text>`,
-    battery: `<rect x="34" y="14" width="32" height="72" rx="10" fill="#1A1030"/><rect x="39" y="22" width="22" height="56" rx="4" fill="#111"/><rect x="39" y="34" width="22" height="44" rx="4" fill="#B6FF3B"/><rect x="46" y="9" width="8" height="7" rx="2" fill="#1A1030"/><path d="M52 40 L45 54 L50 54 L47 68 L58 50 L52 50 Z" fill="#FFD400"/><circle cx="74" cy="24" r="4" fill="#FFD400"/><circle cx="80" cy="34" r="2.4" fill="#FFD400"/>`,
-    snack: `<circle cx="50" cy="52" r="30" fill="#D99355"/><circle cx="40" cy="44" r="4" fill="#6B3F1E"/><circle cx="58" cy="42" r="4" fill="#6B3F1E"/><circle cx="52" cy="58" r="4" fill="#6B3F1E"/><circle cx="38" cy="62" r="4" fill="#6B3F1E"/><circle cx="64" cy="60" r="4" fill="#6B3F1E"/><path d="M70 22 c4 -6 12 -6 14 0 c2 6 -4 10 -7 14 c-3 -4 -9 -8 -7 -14 z" fill="#FF3E8C"/>`,
-    chat: `<path d="M14 26 h72 a8 8 0 0 1 8 8 v28 a8 8 0 0 1 -8 8 H46 l-14 14 v-14 H14 a8 8 0 0 1 -8 -8 V34 a8 8 0 0 1 8 -8 z" fill="#23E5DB"/><path d="M50 44 c4 -6 12 -6 14 0 c2 6 -4 10 -14 18 c-10 -8 -16 -12 -14 -18 c2 -6 10 -6 14 0 z" fill="#fff"/>`,
-    praise: `<circle cx="50" cy="50" r="34" fill="#FFD400"/><path d="M34 52 l10 10 22 -24" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 8 l3 8 8 1 -6 6 1 8 -6 -4 -6 4 1 -8 -6 -6 8 -1 z" fill="#fff" opacity="0.85" transform="translate(0,-2) scale(0.5) translate(50,10)"/>`,
-    calledname: `<path d="M14 30 h72 a6 6 0 0 1 6 6 v24 a6 6 0 0 1 -6 6 H36 l-12 12 v-12 H14 a6 6 0 0 1 -6 -6 V36 a6 6 0 0 1 6 -6 z" fill="#FF9A3D"/><circle cx="34" cy="48" r="14" fill="#fff"/><path d="M30 44 a4 4 0 1 1 8 0 a4 4 0 0 1 -8 0" fill="#FF9A3D"/><path d="M26 56 c1 -6 12 -6 14 -1" stroke="#FF9A3D" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M58 40 q6 -4 6 4 q0 6 -6 4" stroke="#fff" stroke-width="3" fill="none"/>`,
-    ytube: `<rect x="14" y="24" width="72" height="52" rx="12" fill="#1A1030"/><path d="M42 40 l20 12 -20 12 z" fill="#FF3E8C"/><path d="M70 14 c4 -6 12 -6 14 0 c2 6 -4 10 -7 14 c-3 -4 -9 -8 -7 -14 z" fill="#FFD400"/>`,
-    daiso: `<path d="M26 34 h48 l6 46 a6 6 0 0 1 -6 6 H26 a6 6 0 0 1 -6 -6 z" fill="#FF3E8C"/><path d="M36 34 v-6 a14 14 0 0 1 28 0 v6" stroke="#fff" stroke-width="5" fill="none"/><path d="M74 20 c3 -5 9 -5 11 0 c2 5 -3 8 -5.5 11 c-2.5 -3 -7.5 -6 -5.5 -11 z" fill="#FFD400"/>`,
-    sleep: `<path d="M62 20 a26 26 0 1 0 18 44 a20 20 0 0 1 -18 -44 z" fill="#B6FF3B"/><text x="72" y="34" font-family="Jua" font-size="15" fill="#fff">Z</text><text x="82" y="24" font-family="Jua" font-size="11" fill="#fff">z</text><rect x="14" y="70" width="50" height="16" rx="6" fill="#23E5DB"/><rect x="10" y="60" width="18" height="16" rx="8" fill="#fff"/>`,
-    roblox: `<rect x="26" y="26" width="48" height="48" rx="6" fill="#B6FF3B" transform="rotate(8 50 50)"/><rect x="40" y="40" width="20" height="20" rx="3" fill="#1A1030" transform="rotate(8 50 50)"/><path d="M74 20 c3 -5 9 -5 11 0 c2 5 -3 8 -5.5 11 c-2.5 -3 -7.5 -6 -5.5 -11 z" fill="#FFD400"/>`
+    ramen: `<path d="M20 60 a30 14 0 0 1 60 0 v6 a30 14 0 0 1 -60 0 z" fill="#FF6FA8"/><ellipse cx="50" cy="60" rx="30" ry="14" fill="#FF3E8C"/><path d="M30 58 q6 -8 12 0 q6 8 12 0 q6 -8 12 0" stroke="#FFD400" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M40 40 C38 32 44 32 42 24" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M56 40 C54 32 60 32 58 24" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    crosswalk: `<rect x="10" y="46" width="80" height="34" fill="#3A3A3A"/><rect x="18" y="46" width="10" height="34" fill="#fff"/><rect x="38" y="46" width="10" height="34" fill="#fff"/><rect x="58" y="46" width="10" height="34" fill="#fff"/><rect x="78" y="46" width="6" height="34" fill="#fff"/><circle cx="72" cy="22" r="18" fill="#B6FF3B" opacity="0.35"/><circle cx="72" cy="22" r="12" fill="#B6FF3B"/>`,
+    allowance: `<rect x="18" y="40" width="64" height="42" rx="8" fill="#8C6BB1"/><rect x="18" y="40" width="64" height="14" rx="8" fill="#6B4E94"/><rect x="42" y="18" width="36" height="20" rx="3" fill="#B6FF3B" transform="rotate(-8 60 28)"/><circle cx="60" cy="28" r="5" fill="#1A1030" transform="rotate(-8 60 28)"/><circle cx="30" cy="66" r="11" fill="#FFD400"/><text x="30" y="71" font-family="Jua" font-size="13" fill="#8A6A00" text-anchor="middle">₩</text>`,
+    soccer: `<rect x="14" y="18" width="72" height="40" fill="none" stroke="#fff" stroke-width="4"/><line x1="14" y1="18" x2="14" y2="58" stroke="#fff" stroke-width="4"/><line x1="86" y1="18" x2="86" y2="58" stroke="#fff" stroke-width="4"/><circle cx="55" cy="66" r="18" fill="#fff"/><path d="M55 52 l7 9 -3 10 h-8 l-3 -10 z" fill="#1A1030"/><path d="M20 66 q10 -6 20 0" stroke="#B6FF3B" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    bread: `<ellipse cx="50" cy="60" rx="36" ry="22" fill="#E3A063"/><path d="M20 58 q30 -34 60 0" fill="#F0C084"/><path d="M34 50 q4 -8 8 0 M50 46 q4 -10 8 0 M64 50 q4 -8 8 0" stroke="#C97D3D" stroke-width="2" fill="none"/><path d="M42 30 l8 10 8 -10" stroke="#FF3E8C" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="50" cy="26" r="6" fill="#FF3E8C"/>`,
+    newfriend: `<circle cx="35" cy="50" r="22" fill="#23E5DB"/><circle cx="65" cy="50" r="22" fill="#FFD400"/><path d="M28 50 h44" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="50" r="7" fill="#fff"/>`,
+    familywalk: `<circle cx="76" cy="20" r="12" fill="#FFD400"/><path d="M10 85 Q30 55 50 70 T90 40" stroke="#B6FF3B" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="20" cy="78" r="6" fill="#FF3E8C"/><circle cx="34" cy="78" r="8" fill="#23E5DB"/><circle cx="48" cy="78" r="5" fill="#8C6BB1"/>`,
+    suddenplay: `<ellipse cx="35" cy="45" rx="26" ry="20" fill="#FF9A3D"/><path d="M20 60 l-4 14 16 -8" fill="#FF9A3D"/><ellipse cx="68" cy="55" rx="22" ry="17" fill="#23E5DB"/><path d="M80 68 l4 12 -14 -7" fill="#23E5DB"/><path d="M42 34 l3 8 8 1 -6 6 1 8 -6 -4 -6 4 1 -8 -6 -6 8 -1 z" fill="#fff"/>`,
+    cloud: `<circle cx="74" cy="24" r="14" fill="#FFD400"/><ellipse cx="40" cy="55" rx="28" ry="16" fill="#fff"/><ellipse cx="60" cy="50" rx="20" ry="14" fill="#fff"/><ellipse cx="25" cy="60" rx="16" ry="11" fill="#fff"/>`,
+    bedsong: `<rect x="14" y="66" width="72" height="16" rx="6" fill="#8C6BB1"/><rect x="10" y="58" width="24" height="16" rx="8" fill="#fff"/><rect x="14" y="50" width="66" height="18" rx="4" fill="#FF9A3D"/><circle cx="70" cy="30" r="6" fill="#1A1030"/><rect x="75" y="14" width="3" height="18" fill="#1A1030"/><circle cx="58" cy="38" r="5" fill="#1A1030"/><rect x="62" y="24" width="3" height="16" fill="#1A1030"/>`,
+    bus: `<rect x="16" y="30" width="68" height="40" rx="10" fill="#23E5DB"/><rect x="24" y="38" width="20" height="16" rx="3" fill="#fff"/><rect x="56" y="38" width="20" height="16" rx="3" fill="#fff"/><circle cx="32" cy="76" r="8" fill="#1A1030"/><circle cx="68" cy="76" r="8" fill="#1A1030"/><path d="M2 40 h8 M0 50 h8 M2 60 h8" stroke="#B6FF3B" stroke-width="4" stroke-linecap="round"/>`,
+    burger: `<path d="M18 44 a32 18 0 0 1 64 0 z" fill="#E3A063"/><rect x="16" y="46" width="68" height="8" fill="#3F9172"/><rect x="16" y="54" width="68" height="10" fill="#C1585F"/><rect x="16" y="64" width="68" height="8" fill="#FFD400"/><path d="M14 72 h72 a8 8 0 0 1 -8 10 h-56 a8 8 0 0 1 -8 -10 z" fill="#E3A063"/>`,
+    handwriting: `<rect x="20" y="14" width="60" height="76" rx="6" fill="#fff" stroke="#E3A063" stroke-width="3"/><path d="M30 32 h30 M30 44 h40 M30 56 h26" stroke="#8C6BB1" stroke-width="4" stroke-linecap="round"/><path d="M56 70 l16 -16 8 8 -16 16 z" fill="#FF9A3D"/><path d="M74 52 l8 8" stroke="#1A1030" stroke-width="3"/><path d="M28 74 l2 6 6 1 -4 4 1 6 -5 -3 -5 3 1 -6 -4 -4 6 -1 z" fill="#FFD400"/>`
   };
   return `<svg class="ticon" viewBox="0 0 100 100">${I[key]||''}</svg>`;
 }
 
 const SETS = [
   { items:[
-    { key:'academy', ko:'학원 갑자기 휴강' },
-    { key:'lunch', ko:'급식 이모작 받음' },
-    { key:'kart', ko:'카트라이더 1등으로 결승선 통과' },
-    { key:'battery', ko:'폰 배터리 100% 완충' },
+    { key:'ramen', ko:'잘 끓인 라면 먹을 때' },
+    { key:'crosswalk', ko:'횡단보도 도착하자마자 초록불로 바뀔 때' },
+    { key:'allowance', ko:'갑자기 부모님이 용돈 주실 때' },
+    { key:'soccer', ko:'축구하다 골 넣었을 때' },
   ]},
   { items:[
-    { key:'snack', ko:'짝꿍이 과자 나눠줌' },
-    { key:'chat', ko:'친구가 먼저 톡 보냄' },
-    { key:'praise', ko:'부모님이 칭찬해줌' },
-    { key:'calledname', ko:'선생님이 내 이름 먼저 불러줌' },
+    { key:'bread', ko:'친구가 직접 구운 빵 선물해줄 때' },
+    { key:'newfriend', ko:'새로운 친구 사귀었을 때' },
+    { key:'familywalk', ko:'가족과 함께 산책하기' },
+    { key:'suddenplay', ko:'친구랑 갑자기 놀게 됐을 때' },
   ]},
   { items:[
-    { key:'ytube', ko:'유튜브 알고리즘 취향 저격' },
-    { key:'daiso', ko:'다이소에서 득템' },
-    { key:'sleep', ko:'알람 없이 늦잠' },
-    { key:'roblox', ko:'로블록스 신맵 오픈' },
+    { key:'cloud', ko:'하늘 봤는데 구름이 예쁠 때' },
+    { key:'bedsong', ko:'침대에 누워 편하게 노래 듣기' },
+    { key:'bus', ko:'버스나 지하철 안 놓치고 탔을 때' },
+    { key:'handwriting', ko:'글씨가 예쁘게 써질 때' },
   ]}
 ];
 const TRANSLATIONS = {
   en: [
-    ["My after-school class got cancelled out of nowhere","Got extra seconds at lunch","Crossed the finish line in 1st place in Kart Rider","Phone battery fully charged to 100%"],
-    ["My deskmate shared a snack with me","A friend texted me first","My parents praised me","My teacher called my name first"],
-    ["YouTube algorithm recommended exactly my taste","Found a great item at Daiso","Slept in without an alarm","A new Roblox map just came out"]
+    ["A perfectly cooked bowl of ramen","The crosswalk light turns green right as you arrive","When your parents suddenly give you allowance","Scoring a goal while playing soccer"],
+    ["A friend gives you bread they baked themselves","Making a new friend","Taking a walk with family","Ending up hanging out with a friend out of nowhere"],
+    ["Looking up and seeing beautiful clouds","Lying in bed listening to music comfortably","Catching the bus or subway right on time","Your handwriting comes out looking really neat"]
   ],
   ru: [
-    ["Дополнительные занятия внезапно отменили","Получил добавку на обеде","Пришёл первым к финишу в Kart Rider","Телефон зарядился на 100%"],
-    ["Сосед по парте поделился со мной снеками","Друг написал мне первым","Родители похвалили меня","Учитель первым назвал моё имя"],
-    ["Алгоритм YouTube порекомендовал именно то, что мне нравится","Нашёл классную вещь в Daiso","Выспался без будильника","Вышла новая карта в Roblox"]
+    ["Идеально сваренная лапша рамен","Светофор становится зелёным именно тогда, когда подходишь к переходу","Когда родители неожиданно дают карманные деньги","Забить гол, играя в футбол"],
+    ["Друг дарит хлеб, испечённый своими руками","Завести нового друга","Прогулка с семьёй","Внезапно оказаться на прогулке с другом"],
+    ["Посмотрел на небо, а облака красивые","Лежать в кровати и спокойно слушать музыку","Успеть на автобус или метро, не опоздав","Почерк получается очень аккуратным"]
   ],
   zh: [
-    ["补习班突然停课","午餐加了一份","在跑跑卡丁车里第一个冲过终点线","手机电量充满100%"],
-    ["同桌分给我零食","朋友先给我发消息","父母表扬了我","老师先叫了我的名字"],
-    ["YouTube算法精准推荐了我喜欢的内容","在大创（Daiso）淘到好东西","没有闹钟也睡到自然醒","Roblox出了新地图"]
+    ["煮得恰到好处的拉面","刚走到人行横道，红绿灯就变绿了","父母突然给零花钱的时候","踢足球时进球的瞬间"],
+    ["朋友送你自己烤的面包","交到新朋友的时候","和家人一起散步","突然和朋友一起玩起来的时候"],
+    ["抬头看到漂亮的云朵","舒服地躺在床上听歌","刚好赶上公交车或地铁","字写得特别漂亮的时候"]
   ]
 };
 let uiLang = 'ko';
